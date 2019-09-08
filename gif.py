@@ -1,29 +1,29 @@
+# Retrieved from: http://formats.kaitai.io/gif/python.html
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
-# Retrieved from: https://formats.kaitai.io/gif/python.html
 
 from pkg_resources import parse_version
 from kaitaistruct import __version__ as ks_version, KaitaiStruct, KaitaiStream, BytesIO
 from enum import Enum
 
-
 if parse_version(ks_version) < parse_version('0.7'):
     raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+
 
 class Gif(KaitaiStruct):
     """GIF (Graphics Interchange Format) is an image file format, developed
     in 1987. It became popular in 1990s as one of the main image formats
     used in World Wide Web.
-    
+
     GIF format allows encoding of palette-based images up to 256 colors
     (each of the colors can be chosen from a 24-bit RGB
     colorspace). Image data stream uses LZW (Lempel–Ziv–Welch) lossless
     compression.
-    
+
     Over the years, several version of the format were published and
     several extensions to it were made, namely, a popular Netscape
     extension that allows to store several images in one file, switching
     between them, which produces crude form of animation.
-    
+
     Structurally, format consists of several mandatory headers and then
     a stream of blocks follows. Blocks can carry additional
     metainformation or image data.
@@ -38,6 +38,7 @@ class Gif(KaitaiStruct):
         graphic_control = 249
         comment = 254
         application = 255
+
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -57,7 +58,7 @@ class Gif(KaitaiStruct):
         while True:
             _ = self._root.Block(self._io, self, self._root)
             self.blocks.append(_)
-            if  ((self._io.is_eof()) or (_.block_type == self._root.BlockType.end_of_file)) :
+            if ((self._io.is_eof()) or (_.block_type == self._root.BlockType.end_of_file)):
                 break
             i += 1
 
@@ -66,6 +67,7 @@ class Gif(KaitaiStruct):
         .. seealso::
            - section 22 - https://www.w3.org/Graphics/GIF/spec-gif89a.txt
         """
+
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -75,7 +77,6 @@ class Gif(KaitaiStruct):
         def _read(self):
             self.lzw_min_code_size = self._io.read_u1()
             self.subblocks = self._root.Subblocks(self._io, self, self._root)
-
 
     class ColorTableEntry(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -89,12 +90,12 @@ class Gif(KaitaiStruct):
             self.green = self._io.read_u1()
             self.blue = self._io.read_u1()
 
-
     class LogicalScreenDescriptorStruct(KaitaiStruct):
         """
         .. seealso::
            - section 18 - https://www.w3.org/Graphics/GIF/spec-gif89a.txt
         """
+
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -123,7 +124,6 @@ class Gif(KaitaiStruct):
 
             self._m_color_table_size = (2 << (self.flags & 7))
             return self._m_color_table_size if hasattr(self, '_m_color_table_size') else None
-
 
     class LocalImageDescriptor(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -177,7 +177,6 @@ class Gif(KaitaiStruct):
             self._m_color_table_size = (2 << (self.flags & 7))
             return self._m_color_table_size if hasattr(self, '_m_color_table_size') else None
 
-
     class Block(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -193,12 +192,12 @@ class Gif(KaitaiStruct):
             elif _on == self._root.BlockType.local_image_descriptor:
                 self.body = self._root.LocalImageDescriptor(self._io, self, self._root)
 
-
     class ColorTable(KaitaiStruct):
         """
         .. seealso::
            - section 19 - https://www.w3.org/Graphics/GIF/spec-gif89a.txt
         """
+
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -212,13 +211,12 @@ class Gif(KaitaiStruct):
                 self.entries.append(self._root.ColorTableEntry(self._io, self, self._root))
                 i += 1
 
-
-
     class Header(KaitaiStruct):
         """
         .. seealso::
            - section 17 - https://www.w3.org/Graphics/GIF/spec-gif89a.txt
         """
+
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -229,12 +227,12 @@ class Gif(KaitaiStruct):
             self.magic = self._io.ensure_fixed_contents(b"\x47\x49\x46")
             self.version = (self._io.read_bytes(3)).decode(u"ASCII")
 
-
     class ExtGraphicControl(KaitaiStruct):
         """
         .. seealso::
            - section 23 - https://www.w3.org/Graphics/GIF/spec-gif89a.txt
         """
+
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -264,7 +262,6 @@ class Gif(KaitaiStruct):
             self._m_user_input_flag = (self.flags & 2) != 0
             return self._m_user_input_flag if hasattr(self, '_m_user_input_flag') else None
 
-
     class Subblock(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -275,7 +272,6 @@ class Gif(KaitaiStruct):
         def _read(self):
             self.num_bytes = self._io.read_u1()
             self.bytes = self._io.read_bytes(self.num_bytes)
-
 
     class ExtApplication(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -295,7 +291,6 @@ class Gif(KaitaiStruct):
                     break
                 i += 1
 
-
     class Subblocks(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -312,7 +307,6 @@ class Gif(KaitaiStruct):
                 if _.num_bytes == 0:
                     break
                 i += 1
-
 
     class Extension(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -332,6 +326,5 @@ class Gif(KaitaiStruct):
                 self.body = self._root.ExtGraphicControl(self._io, self, self._root)
             else:
                 self.body = self._root.Subblocks(self._io, self, self._root)
-
 
 
