@@ -1,4 +1,5 @@
 from gif import Gif
+import math
 
 def write_to_file(gif, filename):
     assert isinstance(gif, Gif)
@@ -64,10 +65,12 @@ def write_to_file(gif, filename):
 
     print(len(res))
 
+
+EOI = "EOI"
+CC = "Clear"
+
 def decode_lzw(imageData):
     assert isinstance(imageData, Gif.ImageData)
-    EOI = "EOI"
-    CC = "Clear"
     bits_to_decode = imageData.lzw_min_code_size + 1
     lzw_table_size = (2 ** imageData.lzw_min_code_size) + 2
     lzw_table = [[str(i)] for i in range(lzw_table_size)]
@@ -139,11 +142,41 @@ def decode_lzw(imageData):
     return indexstream
 
 
+def encode_lzw(indexstream):
+    max_index = max([int(i, base=10) for i in indexstream])
+    min_code = math.ceil(math.log(max_index, 2))
+    if min_code == 1:
+        min_code = 2
+    lzw_table_size = (2 ** min_code) + 2
+    lzw_table = [[str(i)] for i in range(lzw_table_size)]
+    lzw_table[-1] = [EOI]
+    lzw_table[-2] = [CC]
+    codestream = []
+
+    codestream.append(lzw_table.index([CC]))
+    index_buffer = [indexstream[0][:]]
+
+    for i in range(1, len(indexstream)):
+        K = [indexstream[i][:]]
+        try:
+            lzw_table.index(index_buffer + K)
+            index_buffer += K
+            if i == len(indexstream) - 1:
+                codestream.append(lzw_table.index(index_buffer))
+        except ValueError:
+            lzw_table.append(index_buffer + K)
+            codestream.append(lzw_table.index(index_buffer))
+            index_buffer = K
+
+    codestream.append(lzw_table.index([EOI]))
+
+    return codestream
+
 
 if __name__ == "__main__":
     # data1 = Gif.from_file("../../../Downloads/parrot.gif")
-    # data1 = Gif.from_file("../../../Downloads/sample_1.gif")
-    data1 = Gif.from_file("../../../Downloads/Earth-29-june.gif")
+    data1 = Gif.from_file("../../../Downloads/sample_1.gif")
+    # data1 = Gif.from_file("../../../Downloads/Earth-29-june.gif")
     # data2 = Gif.from_file("../../../Downloads/tumblr_pvk36wTOsT1ytp1fjo1_540.gif")
     # print(data1.hdr.magic)
     print(data1.hdr.version)
@@ -166,7 +199,9 @@ if __name__ == "__main__":
     blocks1 = data1.blocks
     for i in blocks1:
         if i.block_type == Gif.BlockType.local_image_descriptor:
-            decode_lzw(i.body.image_data)
+            indexstream = decode_lzw(i.body.image_data)
+            encode_lzw(indexstream)
+            break
 
     # blocks2 = data2.blocks
     # print(len(blocks1))
