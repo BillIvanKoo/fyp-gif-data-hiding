@@ -83,9 +83,9 @@ def decode_lzw(imageData):
 
         bit_str = bin(int.from_bytes(i.bytes, byteorder='little'))[2:].zfill(i.num_bytes*8) + bit_str
 
+    print(bit_str)
     # remove clear code
     bit_str = bit_str[:-bits_to_decode]
-
     # start with first item
     curr_code = int(bit_str[-bits_to_decode:], 2)
     bit_str = bit_str[:-bits_to_decode]
@@ -151,9 +151,9 @@ def encode_lzw(indexstream):
     lzw_table = [[str(i)] for i in range(lzw_table_size)]
     lzw_table[-1] = [EOI]
     lzw_table[-2] = [CC]
-    codestream = []
 
-    codestream.append(lzw_table.index([CC]))
+    bits_to_decode = min_code + 1
+    codestream = bin(lzw_table.index([CC]))[2:]
     index_buffer = [indexstream[0][:]]
 
     for i in range(1, len(indexstream)):
@@ -162,13 +162,15 @@ def encode_lzw(indexstream):
             lzw_table.index(index_buffer + K)
             index_buffer += K
             if i == len(indexstream) - 1:
-                codestream.append(lzw_table.index(index_buffer))
+                codestream = bin(lzw_table.index(index_buffer))[2:].zfill(bits_to_decode) + codestream
         except ValueError:
             lzw_table.append(index_buffer + K)
-            codestream.append(lzw_table.index(index_buffer))
+            codestream = bin(lzw_table.index(index_buffer))[2:].zfill(bits_to_decode) + codestream
             index_buffer = K
+            if len(lzw_table) > 2 ** bits_to_decode:
+                bits_to_decode += 1
 
-    codestream.append(lzw_table.index([EOI]))
+    codestream = bin(lzw_table.index([EOI]))[2:] + codestream
 
     return codestream
 
@@ -200,7 +202,7 @@ if __name__ == "__main__":
     for i in blocks1:
         if i.block_type == Gif.BlockType.local_image_descriptor:
             indexstream = decode_lzw(i.body.image_data)
-            encode_lzw(indexstream)
+            print(encode_lzw(indexstream))
             break
 
     # blocks2 = data2.blocks
