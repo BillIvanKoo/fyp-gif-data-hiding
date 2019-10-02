@@ -35,7 +35,7 @@ def write_to_file(gif, filename):
                 res += bytearray(gc_body.transparent_idx.to_bytes(1, 'little'))
                 res += bytearray(gc_body.terminator)
             elif i.body.label == Gif.ExtensionLabel.comment:
-                for j in i.body.entries:
+                for j in i.body.body.entries:
                     res += bytearray(j.num_bytes.to_bytes(1, 'little'))
                     res += bytearray(j.bytes)
             elif i.body.label == Gif.ExtensionLabel.application:
@@ -46,7 +46,7 @@ def write_to_file(gif, filename):
                     res += bytearray(j.num_bytes.to_bytes(1, 'little'))
                     res += bytearray(j.bytes)
             else:
-                for j in i.body.entries:
+                for j in i.body.body.entries:
                     res += bytearray(j.num_bytes.to_bytes(1, 'little'))
                     res += bytearray(j.bytes)
         if i.block_type == Gif.BlockType.local_image_descriptor:
