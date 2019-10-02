@@ -1,4 +1,5 @@
 from gif import Gif
+import copy
 import math
 
 def write_to_file(gif, filename):
@@ -34,7 +35,9 @@ def write_to_file(gif, filename):
                 res += bytearray(gc_body.transparent_idx.to_bytes(1, 'little'))
                 res += bytearray(gc_body.terminator)
             elif i.body.label == Gif.ExtensionLabel.comment:
-                print("comment")
+                for j in i.body.entries:
+                    res += bytearray(j.num_bytes.to_bytes(1, 'little'))
+                    res += bytearray(j.bytes)
             elif i.body.label == Gif.ExtensionLabel.application:
                 app_body = i.body.body
                 res += bytearray(app_body.application_id.num_bytes.to_bytes(1, 'little'))
@@ -42,16 +45,17 @@ def write_to_file(gif, filename):
                 for j in app_body.subblocks:
                     res += bytearray(j.num_bytes.to_bytes(1, 'little'))
                     res += bytearray(j.bytes)
-                    # print(j.num_bytes, j.bytes)
             else:
-                print('Plain text')
+                for j in i.body.entries:
+                    res += bytearray(j.num_bytes.to_bytes(1, 'little'))
+                    res += bytearray(j.bytes)
         if i.block_type == Gif.BlockType.local_image_descriptor:
             res += bytearray(i.body.left.to_bytes(2, 'little'))
             res += bytearray(i.body.top.to_bytes(2, 'little'))
             res += bytearray(i.body.width.to_bytes(2, 'little'))
             res += bytearray(i.body.height.to_bytes(2, 'little'))
             res += bytearray(i.body.flags.to_bytes(1, 'little'))
-            if i.body.has_color_table:
+            if (i.body.flags & 128) != 0:
                 for c in i.body.local_color_table.entries:
                     res += bytearray(c.red.to_bytes(1, 'little'))
                     res += bytearray(c.green.to_bytes(1, 'little'))
@@ -172,6 +176,16 @@ def encode_lzw(indexstream):
 
     codestream = bin(lzw_table.index([EOI]))[2:] + codestream
 
+    code_len = len(codestream)
+    i = code_len-1
+    max_subblock_len = 255
+    new_entries = []
+    while i >= 0:
+        break
+
+
+    # print(int(codestream, 2))
+    # print(int(codestream, 2).to_bytes(len(codestream)+7 // 8, 'little'))
     return codestream
 
 
@@ -184,20 +198,6 @@ if __name__ == "__main__":
     print(data1.hdr.version)
 
 
-    # color_table1 = data1.global_color_table.entries
-    # color_table2 = data2.global_color_table.entries
-
-    # for i in range(1, len(color_table1)):
-    #     color1 = color_table1[i]
-    #     color2 = color_table2[i]
-    #
-    #     print(i, "\t", color1.red, color1.green, color1.blue, "\t", color2.red, color2.green, color2.blue)
-
-    # print(data2.logical_screen_descriptor.has_color_table)
-    # print(data2.logical_screen_descriptor.flags)
-    # data2.logical_screen_descriptor.flags ^= 128
-    # print(data2.logical_screen_descriptor.has_color_table)
-    # print(data2.logical_screen_descriptor.flags)
     blocks1 = data1.blocks
     for i in blocks1:
         if i.block_type == Gif.BlockType.local_image_descriptor:
@@ -205,13 +205,3 @@ if __name__ == "__main__":
             print(encode_lzw(indexstream))
             break
 
-    # blocks2 = data2.blocks
-    # print(len(blocks1))
-    # print(len(blocks2))
-    # write_to_file(data2, "result.gif");
-
-    # for i in range(len(blocks1)):
-    #     if i >= len(blocks2):
-    #         print(i, blocks1[i].block_type)
-    #     else:
-    #         print(i, "\t", blocks1[i].block_type, "\t", blocks2[i].block_type)
