@@ -38,12 +38,7 @@ def lsb_decode(color_table):
             bitstring += "1"
 
     length = int(bitstring[0:8],2)
-    print(length)
-    # check if the length is less than 95, if not then there is no data hidden, return empty string
-    if length > 95:
-        decoded = ""
-    else:
-        decoded = binarytoASCII(bitstring[8:(length+1)*8])
+    decoded = binarytoASCII(bitstring[8:(length+1)*8])
 
     return decoded
 
