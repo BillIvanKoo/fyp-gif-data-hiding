@@ -67,7 +67,6 @@ def write_to_file(gif, filename):
     with open(filename, 'wb+') as f:
         f.write(res)
 
-    print(len(res))
 
 
 EOI = "EOI"
@@ -84,8 +83,10 @@ def decode_lzw(imageData):
 
     bit_str = ""
     for i in imageData.subblocks.entries:
+        print(i.bytes)
+        if i.bytes != b'':
+            bit_str = bin(int.from_bytes(i.bytes, byteorder='little'))[2:].zfill(i.num_bytes*8) + bit_str
 
-        bit_str = bin(int.from_bytes(i.bytes, byteorder='little'))[2:].zfill(i.num_bytes*8) + bit_str
 
     print(bit_str)
     # remove clear code
@@ -177,16 +178,41 @@ def encode_lzw(indexstream):
     codestream = bin(lzw_table.index([EOI]))[2:] + codestream
 
     code_len = len(codestream)
-    i = code_len-1
+    i = code_len
+    bytes_list = []
+    while i >= 0:
+        if i < 8:
+            byte_string = ("0"*(8-i)) + codestream[:i]
+        else:
+            byte_string = codestream[i-8:i]
+        bytes_list = [int(byte_string, 2).to_bytes(len(byte_string)//8, byteorder='little')] + bytes_list
+        i -= 8
+
+    print(bytes_list)
+
     max_subblock_len = 255
     new_entries = []
-    while i >= 0:
-        break
+    temp_byte = bytearray()
+    byte_count = 0
+    for i in range(len(bytes_list)):
+        temp_byte = bytes_list[i] + temp_byte
+        byte_count += 1
+        if byte_count == max_subblock_len or i == len(bytes_list) - 1:
+            new_subblock = Gif.Subblock(None)
+            new_subblock.num_bytes = byte_count
+            new_subblock.bytes = temp_byte
+            new_entries.append(new_subblock)
+            byte_count = 0
+
+    new_subblock = Gif.Subblock(None)
+    new_subblock.num_bytes = 0
+    new_subblock.bytes = b''
+    new_entries.append(new_subblock)
 
 
     # print(int(codestream, 2))
     # print(int(codestream, 2).to_bytes(len(codestream)+7 // 8, 'little'))
-    return codestream
+    return new_entries
 
 
 if __name__ == "__main__":
@@ -194,14 +220,16 @@ if __name__ == "__main__":
     data1 = Gif.from_file("../../../Downloads/sample_1.gif")
     # data1 = Gif.from_file("../../../Downloads/Earth-29-june.gif")
     # data2 = Gif.from_file("../../../Downloads/tumblr_pvk36wTOsT1ytp1fjo1_540.gif")
-    # print(data1.hdr.magic)
-    print(data1.hdr.version)
 
 
     blocks1 = data1.blocks
     for i in blocks1:
         if i.block_type == Gif.BlockType.local_image_descriptor:
             indexstream = decode_lzw(i.body.image_data)
-            print(encode_lzw(indexstream))
-            break
+            indexstream[0] = "2"
+            indexstream[6] = "1"
+            encoded_index = encode_lzw(indexstream)
+            i.body.image_data.subblocks.entries = encoded_index
+
+    write_to_file(data1, "test-result.gif")
 

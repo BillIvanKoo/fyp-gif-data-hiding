@@ -83,7 +83,8 @@ class Gif(KaitaiStruct):
             self._io = _io
             self._parent = _parent
             self._root = _root if _root else self
-            self._read()
+            if _io is not None:
+                self._read()
 
         def _read(self):
             self.red = self._io.read_u1()
@@ -267,7 +268,8 @@ class Gif(KaitaiStruct):
             self._io = _io
             self._parent = _parent
             self._root = _root if _root else self
-            self._read()
+            if _io is not None:
+                self._read()
 
         def _read(self):
             self.num_bytes = self._io.read_u1()
