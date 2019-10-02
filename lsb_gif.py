@@ -1,5 +1,55 @@
 from gif import Gif
 from kaitai_gif_demo import write_to_file
+
+def copy_global_ct(inputgif):
+    """
+    This function creates a copy of the global colour table
+    :param inputgif: the input gif object
+    :return: new table which is a deep copy of the global color table
+    """
+    global_table = inputgif.global_color_table
+    new_table = Gif.ColorTable(global_table._io)
+    for i in global_table.entries:
+        newcolor = Gif.ColorTableEntry(None)
+        newcolor.red = i.red
+        newcolor.green = i.green
+        newcolor.blue = i.blue
+        new_table.entries.append(newcolor)
+    return new_table
+
+def set_local_color_table(inputgif):
+    blocks = inputgif.blocks
+    indexlist = []
+    # get all the indices of frames of a gif
+    for i in range(len(blocks)):
+        if str(blocks[i].block_type) == "BlockType.local_image_descriptor":
+            indexlist.append(i)
+
+    for i in range(1,len(indexlist)):
+        index = indexlist[i]
+        if blocks[index].body.flags > 0:                     # more than 0 if there is a local color table
+            pass
+
+        else:                                               # 0 if there is no local color table
+            blocks[index].body.flags = 135                     # set the flag to more than 0 to indicate there is color table
+            new_table = copy_global_ct(inputgif)
+            inputgif.blocks[index].body.local_color_table = new_table
+
+    return indexlist
+
+def count_available_storage(inputgif):
+    """
+    A function to count how many characters can be stored in the GIF
+    :param inputgif: The target GIF object
+    :return: total number of characters to be stored in the GIF
+    """
+    # global colour table available storage
+    count = 255 * 3                                       # 1 entry is used as an indicator of how many characters are stored
+    frames = len(set_local_color_table(inputgif)) - 1     # number of frames available, not including the first frame
+    count += 255 * 3 * frames               # total number of bits to be stored
+    count = count // 8                      # divide by each 8-bit ASCII to get character count
+    return count
+
 def binarytoASCII(bitstring):
     # ASCII characters have 8 bits
     res = ""
@@ -9,9 +59,12 @@ def binarytoASCII(bitstring):
         res += char
     return res
 
-def lsb_global_encode(inputgif, message):
+def lsb_encode(inputgif, message):
+    # First, count available storage of the GIF
+    available_size = count_available_storage(inputgif)
+
     color_table = inputgif.global_color_table.entries
-    charlist = [format(ord(c),'08b') for c in message]                  # changes the characters to 7-bit ASCII values in BINARY
+    charlist = [format(ord(c),'08b') for c in message]                  # changes the characters to 8-bit ASCII values in BINARY
 
     bitstring = "".join(charlist)
     remaining = len(bitstring) % 3
@@ -112,11 +165,10 @@ def lsb_global_encode(inputgif, message):
     inputgif.global_color_table.entries = color_table
     return inputgif
 
-def lsb_global_decode(encodedgif):
-    decoded = ""
+def lsb_decode(encodedgif):
     bitstring = ""
     color_table = encodedgif.global_color_table.entries
-    # the length of the message (in bits) is  stored in the last global table
+    # the length of the message (in bits) is  stored in the last entry of global table in RED
     length = color_table[-1].red
     remaining = length % 3
 
@@ -173,17 +225,17 @@ def lsb_global_decode(encodedgif):
     return decoded
 if __name__ == "__main__":
     in_gif = Gif.from_file("D:\Monash\FIT3162\GIF collection\levi.gif")
-    message = "!@#$%^&*()"
-    #opfile = open("message.txt")
-    #message = opfile.readline()
-    #print(len(message))
-    out_gif = lsb_global_encode(in_gif,message)
-    print("Bits encoded:", in_gif.global_color_table.entries[-1].red)
+    messages = "asdfghjkl"
+
+    lsb_encode(in_gif,messages)
+    #out_gif = lsb_encode(in_gif,message)
+    #print("Bits encoded:", in_gif.global_color_table.entries[-1].red)
 
     #print("GENERATING GIF...")
     #write_to_file(out_gif,"D:\Monash\FIT3162\GIF collection\levi_encoded.gif")
     #print("GIF GENERATED")
 
-    print("DECODING GIF...")
-    decoded = lsb_global_decode(out_gif)
-    print("Decoded message:",decoded)
+    #print("DECODING GIF...")
+    #decoded = lsb_decode(out_gif)
+    #print("Decoded message:",decoded)
+
