@@ -61,19 +61,18 @@ def decode(path):
         lct = blocks[index].body.local_color_table.entries
         temp = lsb_decode(lct)
         result += temp
-        if temp == "":
+        if len(temp) != 95:         # break the loop when you first get character count != 95 (this is the remaining characters left)
             break
 
-    #file = open("result.txt", "w")
-    #file.write(result)
-    #file.close()
-    print(result)
-    print("GIF successfully decoded. Output is in results.txt")
+    file = open("result.txt", "w")
+    file.write(result)
+    file.close()
+    print("GIF successfully decoded. Output is in result.txt")
 
 if __name__ == "__main__":
     path = "D:/Monash/FIT3162/GIF collection/hw2.gif"
     newpath = "D:\Monash\FIT3162\GIF collection\output.gif"
-    messagefile = "message2.txt"
+    messagefile = "message.txt"
     encode(path, newpath, messagefile)
-    #decode(newpath)
+    decode(newpath)
 
