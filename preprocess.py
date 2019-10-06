@@ -42,6 +42,7 @@ def checkGCT(inputgif):
             new_table.entries.append(newcolor)
         inputgif.global_color_table = new_table
 
+    inputgif.logical_screen_descriptor.flags = 247          # change the flag value to indicate correct size of gct
     return inputgif
 
 def copy_global_ct(inputgif):
@@ -110,7 +111,6 @@ def count_available_storage(inputgif):
     :return: total number of characters to be stored in the GIF
     """
     inputgif = checkGCT(inputgif)
-
     count = 0
     frames = len(set_local_color_table(inputgif))           # number of frames/local color tables available
     count += ((256 * 3) - 8) * frames                       # total number of bits to be stored in local and global color table
