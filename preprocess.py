@@ -1,4 +1,5 @@
 from gif import Gif
+from kaitai_gif_demo import write_to_file
 
 def checkGCT(inputgif):
     """
@@ -15,7 +16,7 @@ def checkGCT(inputgif):
 
         else:                                           # if size not 256
             old_table = global_table.entries
-            new_table = Gif.ColorTable(inputgif._io)        # create new empty table
+            new_table = Gif.ColorTable(global_table._io)        # create new empty table
             for i in range(256):
                 if i < len(old_table):              # append the old table RGB values
                     newcolor = Gif.ColorTableEntry(None)
@@ -31,7 +32,7 @@ def checkGCT(inputgif):
                     newcolor.blue = 0
                     new_table.entries.append(newcolor)
             inputgif.global_color_table = new_table
-
+    """
     else:       # if there is no color table, create one
         new_table = Gif.ColorTable(inputgif._io)
         for i in range(256):
@@ -41,7 +42,7 @@ def checkGCT(inputgif):
             newcolor.blue = 0
             new_table.entries.append(newcolor)
         inputgif.global_color_table = new_table
-
+    """
     inputgif.logical_screen_descriptor.flags = 247          # change the flag value to indicate correct size of gct
     return inputgif
 
