@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Button, Image } from 'react-bootstrap'
 
-class GifEncoder extends React.Component {
+class GifEncode extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -139,4 +139,4 @@ class GifEncoder extends React.Component {
     }
 }
 
-export default GifEncoder
+export default GifEncode

@@ -106,3 +106,23 @@ def encode():
                 res += bytearray(j.bytes)
 
     return send_file(BytesIO(bytes(res)), mimetype='image/gif', as_attachment=True, attachment_filename="%s_encoded.gif" % file.filename)
+
+@app.route("/gif/decode", methods=["POST"])
+def decode():
+    file = request.files['file']
+    encoded = Gif(KaitaiStream(BytesIO(file.read())))
+    gct = encoded.global_color_table.entries
+    result = lsb_decode(gct)
+
+    blocks = encoded.blocks
+    tables_index = get_lct_index(encoded)
+
+    for i in range(1, len(tables_index)):
+        index = tables_index[i]
+        lct = blocks[index].body.local_color_table.entries
+        temp = lsb_decode(lct)
+        result += temp
+        if len(temp) != 95:         # break the loop when you first get character count != 95 (this is the remaining characters left)
+            break
+
+    return {"message": result}
