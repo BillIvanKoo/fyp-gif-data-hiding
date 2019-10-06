@@ -54,12 +54,13 @@ def count_available_storage(inputgif):
 if __name__ == "__main__":
     # check all the GIFs for the last entry in the global colour table
     path = "D:\Monash\FIT3162\GIF collection"
-    """
+
     for filename in glob.glob(os.path.join(path, '*.gif')):
         print(filename)
         in_gif = Gif.from_file(filename)
         gct = in_gif.global_color_table.entries
         print("Length of GCT",len(gct))
+        print("GCT FLAG VALUE:",in_gif.logical_screen_descriptor.flags)
         #print(gct[-1].red, gct[-1].green, gct[-1].blue)
         #print(count_available_storage(in_gif))
         print("Check first index of local colour table")
@@ -68,7 +69,7 @@ if __name__ == "__main__":
         for i in range(len(blocks)):
             if str(blocks[i].block_type) == "BlockType.local_image_descriptor":
                 indexlist.append(i)
-                print(blocks[i].body.flags)
+                #print(blocks[i].body.flags)
         #set_local_color_table(in_gif)
         #print("lct",len(blocks[indexlist[1]].body.local_color_table.entries))
         print("number of frames:",len(indexlist))
@@ -85,3 +86,16 @@ if __name__ == "__main__":
 
     for i in range(1,len(indexlist)):
         print(len(blocks[indexlist[i]].body.local_color_table.entries))
+    
+    gif = "D:\Monash\FIT3162\GIF collection\hw2.gif"
+    in_gif = Gif.from_file(gif)
+
+    gif1 = "D:\Monash\FIT3162\GIF collection\circle.gif"
+    circle = Gif.from_file(gif1)
+    gif2 = "D:\Monash\FIT3162\GIF collection\shiba.gif"
+    shiba = Gif.from_file(gif2)
+
+    print(circle.logical_screen_descriptor.flags)
+    print(shiba.logical_screen_descriptor.flags)
+    print(in_gif.logical_screen_descriptor.flags)
+    """
