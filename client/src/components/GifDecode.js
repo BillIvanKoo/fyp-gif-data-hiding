@@ -22,6 +22,7 @@ class GifDecode extends Component {
             body: data
         }).then((res)=>{
             res.json().then(body => {
+                console.log(body)
                 this.setState({
                     message: body.message
                 })
@@ -46,6 +47,7 @@ class GifDecode extends Component {
                 <Button type="submit" onClick={(e)=>{this.handleGifSubmit(e)}}>
                     Get Hidden Message
                 </Button>
+                {this.state.message}
             </Form>
         )
     }

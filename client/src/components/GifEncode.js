@@ -38,7 +38,6 @@ class GifEncode extends React.Component {
                 method: 'POST',
                 body: data
             }).then((res) => {
-                console.log(res)
                 res.blob().then(blob => {
                     let tempURL = URL.createObjectURL(blob);
                     this.setState({
@@ -46,6 +45,9 @@ class GifEncode extends React.Component {
                         result_preview: tempURL
                     })
                 })
+                // res.json().then(body => {
+                //     console.log(body)
+                // })
             })
         }
         

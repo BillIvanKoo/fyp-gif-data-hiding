@@ -6,6 +6,7 @@ from kaitaistruct import KaitaiStream, BytesIO
 from gif import Gif
 from flask import Flask, request, send_file
 from flask_cors import CORS, cross_origin
+import io
 
 app = Flask(__name__)
 CORS(app)
@@ -105,7 +106,7 @@ def encode():
                 res += bytearray(j.num_bytes.to_bytes(1, 'little'))
                 res += bytearray(j.bytes)
 
-    return send_file(BytesIO(bytes(res)), mimetype='image/gif', as_attachment=True, attachment_filename="%s_encoded.gif" % file.filename)
+    return send_file(io.BytesIO(bytes(res)), mimetype='image/gif'); 
 
 @app.route("/gif/decode", methods=["POST"])
 def decode():
@@ -113,7 +114,10 @@ def decode():
     encoded = Gif(KaitaiStream(BytesIO(file.read())))
     gct = encoded.global_color_table.entries
     result = lsb_decode(gct)
+    
 
+    if len(result) != 95:
+        return {"message": result}
     blocks = encoded.blocks
     tables_index = get_lct_index(encoded)
 

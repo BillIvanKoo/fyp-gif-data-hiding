@@ -52,6 +52,9 @@ def decode(path):
     encoded = Gif.from_file(path)
     gct = encoded.global_color_table.entries
     result = lsb_decode(gct)
+    
+    if len(result) != 95:
+        return result
 
     blocks = encoded.blocks
     tables_index = get_lct_index(encoded)
