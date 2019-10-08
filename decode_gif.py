@@ -2,6 +2,11 @@ from gif import Gif
 from encode_gif import lsb_encode
 
 def binarytoASCII(bitstring):
+    """
+    This function changes a bitstring to a normal ASCII string
+    :param bitstring: string of 0s and 1s
+    :return: string of characters
+    """
     # ASCII characters have 8 bits
     res = ""
     for i in range(0,len(bitstring),8):
@@ -11,6 +16,11 @@ def binarytoASCII(bitstring):
     return res
 
 def lsb_decode(color_table):
+    """
+    This function converts encoded colour table to string of decoded characters
+    :param color_table: GIF color table
+    :return: string of characters
+    """
     bitstring = ""
     for i in range(len(color_table)):
         red = color_table[i].red
