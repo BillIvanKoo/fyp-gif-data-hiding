@@ -2,15 +2,17 @@ from preprocess import *
 from encode_gif import *
 from decode_gif import *
 from kaitai_gif_demo import *
+import os, glob
 
 def encode(path, newpath, messagefile):
+    # capacity, message, GIF)
     in_gif = Gif.from_file(path)
     capacity = count_available_storage(in_gif)
-    print("Total available storage in GIF (#characters): ", capacity)
+    #print("Total available storage in GIF (#characters): ", capacity)
 
     message = read_message(messagefile)         # read the message file into a string
     m_size = len(message)
-    print("Message size is: ", m_size)
+    #print("Message size is: ", m_size)
 
     # ENCODING PART
     if m_size <= capacity:
@@ -24,7 +26,7 @@ def encode(path, newpath, messagefile):
         gct = lsb_encode(message[0:95], gct)
         # update the global color table
         in_gif.global_color_table.entries = gct
-        print(num_tables)
+
         # if the tables to be used is more than 0 (there are still message to be encoded)
         if num_tables > 0:
             tables_index = set_local_color_table(in_gif)
@@ -53,6 +55,9 @@ def decode(path):
     gct = encoded.global_color_table.entries
     result = lsb_decode(gct)
 
+    if len(result) != 95:
+        return result
+
     blocks = encoded.blocks
     tables_index = get_lct_index(encoded)
 
@@ -64,15 +69,37 @@ def decode(path):
         if len(temp) != 95:         # break the loop when you first get character count != 95 (this is the remaining characters left)
             break
 
-    file = open("result.txt", "w")
-    file.write(result)
-    file.close()
-    print("GIF successfully decoded. Output is in result.txt")
+    return result
+    #file = open("result.txt", "w")
+    #file.write(result)
+    #file.close()
+    #print("GIF successfully decoded. Output is in result.txt")
 
 if __name__ == "__main__":
+    """
     path = "D:/Monash/FIT3162/GIF collection/hw2.gif"
     newpath = "D:\Monash\FIT3162\GIF collection\output.gif"
     messagefile = "message.txt"
     encode(path, newpath, messagefile)
     decode(newpath)
+    """
+    path = "D:/Monash/FIT3162/GIF collection/levi.gif"
+    newpath = "D:/Monash/FIT3162/GIF collection/encoded/levi-encoded.gif"
+    messagefile = "message.txt"
+    #encode(path, newpath, messagefile)
+
+    sns = "D:/Monash/FIT3162/GIF collection/sns/tumblr/c.gif"
+    #decode(sns)
+
+    message = read_message(messagefile)
+
+    giphy = "D:/Monash/FIT3162/GIF collection/sns/giphy"
+    for filename in glob.glob(os.path.join(giphy, '*.gif')):
+        #print(filename)
+        in_gif = Gif.from_file(filename)
+        #print(os.path.getsize(filename))
+
+    new = "D:\Monash\FIT3162\GIF collection\encoded/c-encoded.gif"
+    res = decode(new)
+    print(res)
 
