@@ -1,4 +1,5 @@
 from gif import Gif
+from kaitai_gif_write import write_to_file
 import math
 
 EOI = "EOI"
@@ -148,3 +149,15 @@ def encode(index_stream):
 
     return new_entries
 
+if __name__ == "__main__":
+    data = Gif.from_file("./sample_1.gif")
+    
+    for i in data.blocks:
+        if i.block_type == Gif.BlockType.local_image_descriptor:
+            indexstream = decode(i.body.image_data)
+            indexstream[0] = "2"
+            indexstream[6] = "1"
+            encoded_index = encode(indexstream)
+            i.body.image_data.subblocks.entries = encoded_index
+
+    write_to_file(data, "test-result.gif")
