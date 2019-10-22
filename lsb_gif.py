@@ -91,8 +91,6 @@ if __name__ == "__main__":
     sns = "D:/Monash/FIT3162/GIF collection/sns/tumblr/c.gif"
     #decode(sns)
 
-    message = read_message(messagefile)
-
     giphy = "D:/Monash/FIT3162/GIF collection/sns/giphy"
     for filename in glob.glob(os.path.join(giphy, '*.gif')):
         #print(filename)

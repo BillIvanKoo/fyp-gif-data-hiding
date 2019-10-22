@@ -1,5 +1,6 @@
-from gif import Gif
-from encode_gif import lsb_encode
+# File decode_gif.py
+# Author: Jia Qin Choong
+# Usage: Functions used to decode the message from a color table
 
 def binarytoASCII(bitstring):
     """
@@ -49,15 +50,4 @@ def lsb_decode(color_table):
 
     length = int(bitstring[0:8],2)
     decoded = binarytoASCII(bitstring[8:(length+1)*8])
-
     return decoded
-
-if __name__ == "__main__":
-    path = "D:\Monash\FIT3162\GIF collection\shiba.gif"
-    in_gif = Gif.from_file(path)
-    color_table = in_gif.global_color_table.entries
-    msg = "secretmessage???"
-    print("length",len(msg))
-    color_table = lsb_encode(msg,color_table)
-    print("Encode success!")
-    lsb_decode(color_table)

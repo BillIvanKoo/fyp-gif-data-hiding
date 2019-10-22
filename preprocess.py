@@ -1,5 +1,8 @@
 from gif import Gif
 from kaitai_gif_demo import write_to_file
+# File preprocess.py
+# Author: Jia Qin Choong
+# Usage: Preprocess the GIF before encoding
 
 def checkGCT(inputgif):
     """
@@ -104,28 +107,12 @@ def count_available_storage(inputgif):
     """
     count = 0
     inputgif = checkGCT(inputgif)
-    if inputgif.logical_screen_descriptor.flags > 0:        # if there is gct
+
+    if inputgif.logical_screen_descriptor.flags >= 128:        # if there is gct
         count += 1
+
     frames = len(set_local_color_table(inputgif))- 1                    # number of frames/local color tables available
     count = ((256 * 3) - 8) * (frames + count)                         # total number of bits to be stored in local and global color table
     # first 8 bit used to store the number of characters in the table
     count = count // 8                                      # divide by 8-bit (ASCII) to get character count
     return count
-
-def read_message(filename):
-    """
-    This function reads a file into a string
-    :param filename: file path
-    :return: a string containing the contents of the file
-    """
-    openfile = open(filename, "r")
-    message = ""
-    for lines in openfile:
-        message += lines
-    return message
-
-if __name__ == "__main__":
-    path = "D:\Monash\FIT3162\GIF collection\circle.gif"
-    in_gif = Gif.from_file(path)
-    print(count_available_storage(in_gif))
-    print(len(read_message("message.txt")))

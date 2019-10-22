@@ -1,4 +1,6 @@
-from gif import Gif
+# File encode_gif.py
+# Author: Jia Qin Choong
+# Usage: Functions used to encode message into a color table
 
 def lsb_encode(message,color_table):
     """
@@ -8,7 +10,7 @@ def lsb_encode(message,color_table):
     :param color_table: global or local color table
     :return: color table
     """
-    #color_table = inputgif.global_color_table.entries
+    # color_table = inputgif.global_color_table.entries
     # get list of characters in 8 bit binary
 
     # Check if the message size is too big, raise error
@@ -116,24 +118,3 @@ def lsb_encode(message,color_table):
                 color_table[last_table_index].green += 1
 
     return color_table
-
-def read_message(filename):
-    """
-    This function reads a file into a string
-    :param filename: file path
-    :return: a string containing the contents of the file
-    """
-    openfile = open(filename, "r")
-    message = ""
-    for lines in openfile:
-        message += lines
-    openfile.close()
-    return message
-
-if __name__ == "__main__":
-    path = "D:\Monash\FIT3162\GIF collection\shiba.gif"
-    in_gif = Gif.from_file(path)
-    color_table = in_gif.global_color_table.entries
-    msg = "secretmessage???"
-    lsb_encode(msg,color_table)
-    print("Encode success!")

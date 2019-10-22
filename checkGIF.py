@@ -1,6 +1,8 @@
-from gif import Gif
 from kaitai_gif_demo import *
 import os, glob
+# File checkGIF.py
+# Author: Jia Qin Choong
+# Usage: This is source file is used to check the properties of the GIF
 
 def copy_global_ct(inputgif):
     """
@@ -74,28 +76,3 @@ if __name__ == "__main__":
         #print("lct",len(blocks[indexlist[1]].body.local_color_table.entries))
         print("number of frames:",len(indexlist))
         print()
-    """
-    gif = "D:\Monash\FIT3162\GIF collection\hw2.gif"
-    in_gif = Gif.from_file(gif)
-    blocks = in_gif.blocks
-    indexlist = []
-
-    for i in range(len(blocks)):
-        if str(blocks[i].block_type) == "BlockType.local_image_descriptor":
-            indexlist.append(i)
-
-    for i in range(1,len(indexlist)):
-        print(len(blocks[indexlist[i]].body.local_color_table.entries))
-    
-    gif = "D:\Monash\FIT3162\GIF collection\hw2.gif"
-    in_gif = Gif.from_file(gif)
-
-    gif1 = "D:\Monash\FIT3162\GIF collection\circle.gif"
-    circle = Gif.from_file(gif1)
-    gif2 = "D:\Monash\FIT3162\GIF collection\shiba.gif"
-    shiba = Gif.from_file(gif2)
-
-    print(circle.logical_screen_descriptor.flags)
-    print(shiba.logical_screen_descriptor.flags)
-    print(in_gif.logical_screen_descriptor.flags)
-    """
