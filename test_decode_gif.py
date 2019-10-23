@@ -4,7 +4,7 @@ from decode_gif import *
 from gif import Gif
 
 # Author : Jia Qin Choong
-# Usage: Testing functions of decode_gif.py (encoding in a color table)
+# Usage: Testing functions of decode_gif.py (decoding in a color table)
 path = "D:\Monash\FIT3162\GIF collection\levi.gif"
 inputgif = Gif.from_file(path)
 gct = inputgif.global_color_table.entries
