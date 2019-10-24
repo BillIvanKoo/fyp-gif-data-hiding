@@ -1,5 +1,6 @@
 from gif import Gif
-
+import copy
+import math
 
 def write_to_file(gif, filename):
     assert isinstance(gif, Gif)
@@ -65,3 +66,4 @@ def write_to_file(gif, filename):
                 res += bytearray(j.bytes)
     with open(filename, 'wb+') as f:
         f.write(res)
+
