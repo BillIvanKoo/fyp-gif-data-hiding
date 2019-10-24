@@ -1,4 +1,8 @@
 from gif import Gif
+from kaitai_gif_demo import write_to_file
+# File preprocess.py
+# Author: Jia Qin Choong
+# Usage: Preprocess the GIF before encoding
 
 def checkGCT(inputgif):
     """
@@ -15,7 +19,7 @@ def checkGCT(inputgif):
 
         else:                                           # if size not 256
             old_table = global_table.entries
-            new_table = Gif.ColorTable(inputgif._io)        # create new empty table
+            new_table = Gif.ColorTable(global_table._io)        # create new empty table
             for i in range(256):
                 if i < len(old_table):              # append the old table RGB values
                     newcolor = Gif.ColorTableEntry(None)
@@ -32,17 +36,8 @@ def checkGCT(inputgif):
                     new_table.entries.append(newcolor)
             inputgif.global_color_table = new_table
 
-    else:       # if there is no color table, create one
-        new_table = Gif.ColorTable(inputgif._io)
-        for i in range(256):
-            newcolor = Gif.ColorTableEntry(None)
-            newcolor.red = 0
-            newcolor.green = 0
-            newcolor.blue = 0
-            new_table.entries.append(newcolor)
-        inputgif.global_color_table = new_table
-
-    inputgif.logical_screen_descriptor.flags = 247          # change the flag value to indicate correct size of gct
+        inputgif.logical_screen_descriptor.flags = 247          # change the flag value to indicate correct size of gct
+    # else no gct just return inputgif
     return inputgif
 
 def copy_global_ct(inputgif):
@@ -110,30 +105,14 @@ def count_available_storage(inputgif):
     :param inputgif: The target GIF object
     :return: total number of characters to be stored in the GIF
     """
-    inputgif = checkGCT(inputgif)
     count = 0
-    frames = len(set_local_color_table(inputgif))           # number of frames/local color tables available
-    count += ((256 * 3) - 8) * frames                       # total number of bits to be stored in local and global color table
+    inputgif = checkGCT(inputgif)
+
+    if inputgif.logical_screen_descriptor.flags >= 128:        # if there is gct
+        count += 1
+
+    frames = len(set_local_color_table(inputgif))- 1                    # number of frames/local color tables available
+    count = ((256 * 3) - 8) * (frames + count)                         # total number of bits to be stored in local and global color table
     # first 8 bit used to store the number of characters in the table
     count = count // 8                                      # divide by 8-bit (ASCII) to get character count
     return count
-
-def read_message(filename):
-    """
-    This function reads a file into a string
-    :param filename: file path
-    :return: a string containing the contents of the file
-    """
-    openfile = open(filename, "r")
-    message = ""
-    for lines in openfile:
-        message += lines
-    return message
-
-# NEED TO ADD ANOTHER PREPROCESSING TO MAKE SURE GLOBAL COLOR TABLE IS OF SIZE 256
-
-if __name__ == "__main__":
-    path = "D:\Monash\FIT3162\GIF collection\circle.gif"
-    in_gif = Gif.from_file(path)
-    print(count_available_storage(in_gif))
-    print(len(read_message("message.txt")))
