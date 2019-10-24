@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Retrieved from: http://formats.kaitai.io/gif/python.html
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
