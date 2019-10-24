@@ -40,9 +40,10 @@ class Test_Preprocess(unittest.TestCase):
         self.assertEqual(len(table.entries), 256, "Failed to copy GCT")
 
     def test_check_gct(self):
+        # checks if the inputGIF contains a GCT
         checkGCT(inputgif)
         flag = inputgif.logical_screen_descriptor.flags
-        self.assertNotEqual(flag & 128, 0, "Failed check GCT")
+        self.assertNotEqual(flag & 135, 0, "Failed check GCT")
 
 if __name__ == '__main__':
     unittest.main()

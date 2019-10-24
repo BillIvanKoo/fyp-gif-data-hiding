@@ -53,13 +53,14 @@ def encode(capacity, message, inputgif):
                 blocks[index].body.local_color_table.entries = lct  # update lct
                 m_index += 95
 
-            # loop through the local color tables
-            for i in range(0,num_tables + 2):  # dont include index 0 (gct), start from 1 up to num_tables (inclusive)
-                index = tables_index[i+1]
-                lct = blocks[index].body.local_color_table.entries
-                lct = lsb_encode(message[m_index:m_index + 95],lct)  # m_index used to get correct index in the message string
-                blocks[index].body.local_color_table.entries = lct  # update lct
-                m_index += 95
+            else:
+                # loop through the local color tables
+                for i in range(1,num_tables + 2):  # dont include index 0 (gct), start from 1 up to num_tables (inclusive)
+                    index = tables_index[i]
+                    lct = blocks[index].body.local_color_table.entries
+                    lct = lsb_encode(message[m_index:m_index + 95],lct)  # m_index used to get correct index in the message string
+                    blocks[index].body.local_color_table.entries = lct  # update lct
+                    m_index += 95
 
         return inputgif
 
