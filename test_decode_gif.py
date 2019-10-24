@@ -8,7 +8,7 @@ from gif import Gif
 path = "D:\Monash\FIT3162\GIF collection\levi.gif"
 inputgif = Gif.from_file(path)
 
-class Test_DeodingGIF(unittest.TestCase):
+class Test_DecodingGIF(unittest.TestCase):
     def test_lsb_decode(self):
         gct = inputgif.global_color_table.entries
         msg = "testmessage2"
