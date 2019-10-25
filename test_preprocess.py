@@ -4,7 +4,7 @@ from gif import Gif
 # Author : Jia Qin Choong
 # Usage : Testing functions in preprocess.py
 
-path = "D:\Monash\FIT3162\GIF collection\levi.gif"
+path = "./test_src/levi.gif"
 inputgif = Gif.from_file(path)
 
 class Test_Preprocess(unittest.TestCase):

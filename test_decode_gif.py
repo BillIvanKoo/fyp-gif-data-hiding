@@ -5,7 +5,7 @@ from gif import Gif
 
 # Author : Jia Qin Choong
 # Usage: Testing functions of decode_gif.py (decoding in a color table)
-path = "D:\Monash\FIT3162\GIF collection\levi.gif"
+path = "./test_src/levi.gif"
 inputgif = Gif.from_file(path)
 
 class Test_DecodingGIF(unittest.TestCase):
