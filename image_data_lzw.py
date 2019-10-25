@@ -1,5 +1,9 @@
+"""
+File name: image_data-lzw.py
+Author: Bill Ivan Kooslarto - 28694120
+Module to LZW decompress and compress image data in Kaitai GIF Object
+"""
 from gif import Gif
-from kaitai_gif_write import write_to_file
 import math
 
 EOI = "EOI"
@@ -8,11 +12,14 @@ CC = "Clear"
 
 def decode(image_data):
     """
-
-    @param image_data:
-    @return:
+    LZW Decompression for Kaitai GIF image data
+    @author: Bill Ivan Kooslarto - 28694120
+    @param image_data: a Kaitai Gif.ImageData object
+    @return: array of indexes
     """
     assert isinstance(image_data, Gif.ImageData)
+    
+    # initialise the LZW table
     bits_to_decode = image_data.lzw_min_code_size + 1
     lzw_table_size = (2 ** image_data.lzw_min_code_size) + 2
     lzw_table = [[str(i)] for i in range(lzw_table_size)]
@@ -20,15 +27,16 @@ def decode(image_data):
     lzw_table[-2] = [CC]
     index_stream = []
 
+    # serialise the data in the subblocks into string
     bit_str = ""
     for i in image_data.subblocks.entries:
-        print(i.bytes)
         if i.bytes != b'':
             bit_str = bin(int.from_bytes(i.bytes, byteorder='little'))[2:].zfill(i.num_bytes*8) + bit_str
 
-    print(bit_str)
     # remove clear code
     bit_str = bit_str[:-bits_to_decode]
+    
+    # LZW decompression starts
     # start with first item
     curr_code = int(bit_str[-bits_to_decode:], 2)
     bit_str = bit_str[:-bits_to_decode]
@@ -40,11 +48,11 @@ def decode(image_data):
         curr_code = int(bit_str[-bits_to_decode:], 2)
         bit_str = bit_str[:-bits_to_decode]
         if curr_code < len(lzw_table):
+            # if it is the end of the image break out of the loop
             if lzw_table[curr_code] == [EOI]:
-                print("END HERE", count)
                 break
+            # if clear code, reset lzw table
             if lzw_table[curr_code] == [CC]:
-                print("CLEAR HERE", count)
                 lzw_table = [[str(i)] for i in range(lzw_table_size)]
                 lzw_table[-1] = [EOI]
                 lzw_table[-2] = [CC]
@@ -52,7 +60,6 @@ def decode(image_data):
                 curr_code = int(bit_str[-bits_to_decode:], 2)
                 bit_str = bit_str[:-bits_to_decode]
                 prev_code = None
-                print(curr_code)
             index_stream += lzw_table[curr_code]
             if prev_code is not None:
                 K = lzw_table[curr_code][0]
@@ -73,12 +80,9 @@ def decode(image_data):
         prev_code = curr_code
 
         if len(lzw_table) == (2 ** bits_to_decode):
-            print(len(lzw_table))
             if bits_to_decode < 12:
                 bits_to_decode += 1
         if len(bit_str) < bits_to_decode:
-            print(bit_str)
-            print(len(lzw_table))
             break
         count += 1
 
@@ -86,6 +90,13 @@ def decode(image_data):
 
 
 def encode(index_stream):
+    """
+    LZW Decompression for Kaitai GIF image data
+    @author: Bill Ivan Kooslarto - 28694120
+    @param image_data: a Kaitai Gif.ImageData object
+    @return: array of indexes
+    """
+    # initialise LZW table
     max_index = max([int(i, base=10) for i in index_stream])
     min_code = math.ceil(math.log(max_index, 2))
     if min_code == 1:
@@ -99,6 +110,7 @@ def encode(index_stream):
     code_stream = bin(lzw_table.index([CC]))[2:]
     index_buffer = [index_stream[0][:]]
 
+    # LZW compress the index array to code stream
     for i in range(1, len(index_stream)):
         K = [index_stream[i][:]]
         try:
@@ -113,8 +125,11 @@ def encode(index_stream):
             if len(lzw_table) > 2 ** bits_to_decode:
                 bits_to_decode += 1
 
+    # add end of information code
     code_stream = bin(lzw_table.index([EOI]))[2:] + code_stream
 
+    
+    # split the code stream into subblocks
     code_len = len(code_stream)
     i = code_len
     bytes_list = []
@@ -125,8 +140,6 @@ def encode(index_stream):
             byte_string = code_stream[i-8:i]
         bytes_list = [int(byte_string, 2).to_bytes(len(byte_string)//8, byteorder='little')] + bytes_list
         i -= 8
-
-    print(bytes_list)
 
     max_subblock_len = 255
     new_entries = []
@@ -148,16 +161,3 @@ def encode(index_stream):
     new_entries.append(new_subblock)
 
     return new_entries
-
-if __name__ == "__main__":
-    data = Gif.from_file("./sample_1.gif")
-    
-    for i in data.blocks:
-        if i.block_type == Gif.BlockType.local_image_descriptor:
-            indexstream = decode(i.body.image_data)
-            indexstream[0] = "2"
-            indexstream[6] = "1"
-            encoded_index = encode(indexstream)
-            i.body.image_data.subblocks.entries = encoded_index
-
-    write_to_file(data, "test-result.gif")

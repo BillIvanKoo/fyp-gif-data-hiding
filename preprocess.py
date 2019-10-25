@@ -1,5 +1,5 @@
 from gif import Gif
-from kaitai_gif_demo import write_to_file
+from kaitai_gif_write import write_to_file
 # File preprocess.py
 # Author: Jia Qin Choong
 # Usage: Preprocess the GIF before encoding
