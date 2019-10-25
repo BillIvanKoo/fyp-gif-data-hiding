@@ -45,9 +45,6 @@ class GifEncode extends React.Component {
                         result_preview: tempURL
                     })
                 })
-                // res.json().then(body => {
-                //     console.log(body)
-                // })
             })
         }
         
@@ -127,10 +124,13 @@ class GifEncode extends React.Component {
             <Form>
                 <Form.Group>
                 <Form.Control type="file" placeholder="select GIF" onChange={(e)=>{
-                    this.setState({
-                        selectedFile: e.target.files[0],
-                        preview: URL.createObjectURL(e.target.files[0])
-                    })
+                    if (e.target.files.length > 0){
+                        this.setState({
+                            selectedFile: e.target.files[0],
+                            preview: URL.createObjectURL(e.target.files[0]),
+                            capacity: null
+                        })
+                    }
                 }}/>
                 <Image src={this.state.preview}/>
                 </Form.Group>

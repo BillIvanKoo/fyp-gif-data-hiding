@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Image, Button } from 'react-bootstrap'
+import { Form, Image, Button, Card } from 'react-bootstrap'
 
 class GifDecode extends Component {
     constructor(props){
@@ -47,7 +47,9 @@ class GifDecode extends Component {
                 <Button type="submit" onClick={(e)=>{this.handleGifSubmit(e)}}>
                     Get Hidden Message
                 </Button>
+                <Card>
                 {this.state.message}
+                </Card>
             </Form>
         )
     }
