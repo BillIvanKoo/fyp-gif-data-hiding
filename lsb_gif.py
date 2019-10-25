@@ -1,7 +1,7 @@
 from preprocess import *
 from encode_gif import lsb_encode
 from decode_gif import *
-from kaitai_gif_demo import *
+from kaitai_gif_write import *
 
 # File lsb_gif.py
 # Author: Jia Qin Choong
